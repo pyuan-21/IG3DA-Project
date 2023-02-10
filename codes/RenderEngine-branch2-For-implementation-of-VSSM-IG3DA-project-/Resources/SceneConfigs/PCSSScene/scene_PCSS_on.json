@@ -1,0 +1,102 @@
+{
+  "generate_shader": {
+                        "inputs": ["Phong/phong_sm_pcss.main_fs"],
+                        "outputs": ["Phong/phong.fs"]
+                     },
+
+  "render_method": "RenderPhong",
+
+  "shadow_config": {
+                      "shadow_method":"ShadowMap",
+                      "resolution": [512, 512],
+                      "use_tight_space": true,
+                      "bias": 0.01,
+
+                      "use_pcss": true,
+                      "max_search_size": 5,
+                      "light_size": 11,
+                      "min_penumbra_size": 9,
+                      "max_penumbra_size": 35,
+                      "penumbra_ratio": 1
+                   },
+
+  "ambient": [0.0],
+
+  "camera": {
+    "position": [0.456758, -0.463012, -0.316232],
+    "rotation": [-0.576264, 2.179998, 0.000000]
+  },
+
+  "lights": [
+    {
+      "name": "point_light_1",
+      "type": "point_light",
+      "position": [0, 1, 0.5],
+      "intensity": 3,
+      "render_shadow": true
+    },
+    {
+      "name": "direct_light_1",
+      "type": "direct_light",
+      "direction": [1, -1, 0],
+      "intensity": 1
+    }
+  ],
+
+  "scene_objects": [
+    {
+      "name": "obj_1",
+      "type": "off",
+      "model": "bunny.off",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "color": [0, 0.3, 0]
+      },
+      "transform": {
+        "position": [0, -1, 0],
+        "rotation": [0],
+        "scale": [3]
+      }
+    },
+    {
+      "name": "obj_3",
+      "type": "cube",
+      "cube_len": 1,
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "color": [0.3]
+      },
+      "transform": {
+        "position": [0.3, -0.85, 0],
+        "rotation": [0],
+        "scale": [0.1]
+      }
+    },
+    {
+      "name": "obj_2",
+      "type": "plane",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [0.0],
+        "shiness": 32,
+        "color": [1]
+      },
+      "transform": {
+        "position": [0, -0.9, 0],
+        "rotation": [0],
+        "scale": [2]
+      }
+    }
+  ]
+
+}

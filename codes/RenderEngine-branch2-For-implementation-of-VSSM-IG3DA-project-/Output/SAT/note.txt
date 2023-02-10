@@ -1,0 +1,3 @@
+I have also tried "panda.png". This image has lower resolution but "GL_RGB16F" is still not enough.
+
+hardcode with reading 8 texels can reach the best performance(fastest)

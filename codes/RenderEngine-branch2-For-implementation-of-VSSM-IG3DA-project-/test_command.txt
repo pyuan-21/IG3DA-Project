@@ -1,0 +1,39 @@
+"F1" to show command
+"load_shadow_config" can be used to load only the shadow config.
+
+// for test Traditional ShadowMap
+load_scene SMScene/scene.json
+
+// for test Traditional ShadowMap and PCF
+load_scene PCFScene/scene_PCF_on.json
+
+// for test Traditional ShadowMap and PCSS
+load_scene PCSSScene/scene_PCSS_on.json
+load_scene PCSSScene/scene_contact_object.json
+
+// for test VSM with SAT, and VSM with car
+load_scene VSMScene/scene_VSM_SAT_off.json
+load_scene VSMScene/scene_VSM_SAT_on.json
+
+load_scene VSMScene/scene_VSM_Car_SAT_off.json
+load_scene VSMScene/scene_VSM_Car_SAT_on.json
+
+// for test the VSM issue when kernel is large
+load_scene VSMScene/scene_multiple_plane.json
+
+// for test VSM fitted into PCSS [my personal version]
+load_scene VSMPCSSScene/scene_VSM_PCSS_off.json
+load_scene VSMPCSSScene/scene_VSM_PCSS_on.json
+load_scene VSMPCSSScene/scene3.json
+
+// for test floating-point issue for VSM. enable/disable "use_sat"
+load_scene VSMPCSSScene/scene_multiple_plane.json
+//we can see noise near to the edge of plane when using SAT
+
+// for test contact object, actually not good enough
+load_scene VSMPCSSScene/scene_contact_object.json
+
+// for test VSSM 
+load_scene VSSMScene/scene.json
+load_scene VSSMScene/scene_multiple_plane.json
+

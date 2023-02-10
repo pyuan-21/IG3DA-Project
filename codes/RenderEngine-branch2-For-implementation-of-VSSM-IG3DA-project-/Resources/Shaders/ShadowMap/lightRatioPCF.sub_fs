@@ -1,0 +1,56 @@
+/*light info*/
+struct LightCamInfo
+{
+	mat4 lightMat;
+	vec3 lightViewDir;
+};
+uniform LightCamInfo lightCamInfos[maxLightNum]; // "maxLightNum" is defined in "phong_sm.main_fs"
+
+/*shadow map*/
+uniform sampler2D shadowMaps[maxLightNum]; // "maxLightNum" is defined in "phong_sm.main_fs"
+uniform float bias;
+
+/*PCF-percentage closer filtering*/
+uniform int usePCF = 0; /*indicate whether use PCF to do filtering*/
+uniform	int pcfHalfKernelSize;
+
+float ComputeLightRatio(LightCamInfo lightCamInfo, sampler2D shadowMap)
+{
+	/*ComputeLightRatio: lightRatio is inside [0, 1]*/
+	vec4 clipCoord = lightCamInfo.lightMat*modelMat*vec4(fPos,1); /*clip space*/
+	vec3 ndcCoord = clipCoord.xyz / clipCoord.w; /*ndc space: [-1,1]^3*/ 
+	vec3 shadowCoord = (ndcCoord+1)/2; /*map [-1,1]^3 to [0,1]^3*/
+	float fragDepth = shadowCoord.z;
+
+	vec2 texSize = textureSize(shadowMap, 0);
+	vec2 texelSize = 1.0/texSize;
+
+	float result = 0.0; // indicate how much lighting on this fragment
+
+	if(usePCF==1)
+	{
+		/*produce soft-edge shadow by using PCF*/
+		/*refer: "Rendering Antialiased Shadows with Depth Maps"(PCF) [Reeves et al. 1987]*/
+		int totalNum = 0;
+		for(int i = -pcfHalfKernelSize; i <= pcfHalfKernelSize; i++)
+		{
+			for(int j = -pcfHalfKernelSize; j <= pcfHalfKernelSize; j++)
+			{
+				float refDepth = texture(shadowMap, shadowCoord.xy+vec2(i,j)*texelSize).r;
+				if(fragDepth<(refDepth+bias))
+					result += 1.0;
+				totalNum += 1;
+			}
+		}
+		result /= totalNum;
+	}
+	else
+	{
+		// produce hard shadow
+		float refDepth = texture(shadowMap, shadowCoord.xy).r; 
+		if(fragDepth<(refDepth+bias))
+			result = 1.0;
+	}
+
+	return result;
+}

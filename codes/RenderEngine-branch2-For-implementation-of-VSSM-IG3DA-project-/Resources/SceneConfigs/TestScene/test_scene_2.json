@@ -1,0 +1,92 @@
+{
+  "generate_shader": {
+                        "inputs": ["Phong/phong_sm.main_fs"],
+                        "outputs": ["Phong/phong.fs"]
+                     },
+
+  "render_method": "RenderPhong",
+
+  "shadow_config": {
+                      "shadow_method":"ShadowMap",
+                      "resolution": [1024, 1024]
+                   },
+
+  "ambient": [0.5],
+
+  "lights": [
+    {
+      "name": "point_light_1",
+      "type": "point_light",
+      "position": [10, 10, 10],
+      "intensity": 5
+    },
+
+    {
+      "name": "point_light_2",
+      "type": "point_light",
+      "position": [-10, -10, 10],
+      "range": 2000
+    },
+
+    {
+      "name": "direct_light_1",
+      "type": "direct_light",
+      "direction": [1, -1, 0],
+      "intensity": 5
+    }
+  ],
+
+  "scene_objects": [
+    {
+      "name": "obj_1",
+      "type": "sphere",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "albedo_tex": "Simple/earth.jpg"
+      }
+    },
+    {
+      "name": "obj_2",
+      "type": "cube",
+      "cube_len": 1,
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "color": [0.1]
+      },
+      "transform": {
+        "position": [1],
+        "rotation": [0],
+        "scale": [1]
+      }
+    },
+
+    {
+      "name": "obj_2",
+      "type": "off",
+      "model": "bunny.off",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "color": [0.1]
+      },
+      "transform": {
+        "position": [1, 0, 0],
+        "rotation": [0],
+        "scale": [3]
+      }
+    }
+
+  ]
+
+}

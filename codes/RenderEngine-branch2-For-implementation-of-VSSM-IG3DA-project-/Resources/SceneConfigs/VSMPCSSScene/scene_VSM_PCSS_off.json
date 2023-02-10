@@ -1,0 +1,89 @@
+{
+  "generate_shader": {
+                        "inputs": ["Phong/phong_vsm_pcss.main_fs"],
+                        "outputs": ["Phong/phong.fs"]
+                     },
+
+  "render_method": "RenderPhong",
+
+  "shadow_config": {
+                      "shadow_method":"VarianceShadowMap",
+                      "use_tight_space": true,
+                      "resolution": [512, 512],
+                      
+                      "use_sat": true,
+                      "kernel_size": 11,
+                      "variance_min": 0.00100,
+                      "p_min": 0.1,
+
+                      "use_pcss": false,
+                      "max_search_size": 3,
+                      "light_size": 15,
+                      "min_penumbra_size": 11,
+                      "max_penumbra_size": 35,
+                      "penumbra_ratio": 1
+                   },
+
+  "ambient": [0.0],
+
+  "camera": {
+    "position": [0.607059, -0.284838, -0.613842],
+    "rotation": [-0.496264, 2.239998, 0.000000]
+  },
+
+  "lights": [
+    {
+      "name": "pl",
+      "type": "point_light",
+      "position": [0, 1.5, 2.5],
+      "intensity": 2,
+      "render_shadow": true 
+    },
+    {
+      "name": "dl",
+      "type": "direct_light",
+      "direction": [1, -1, -1],
+      "intensity": 2,
+      "render_shadow": false
+    }
+  ],
+
+  "scene_objects": [
+    {
+      "name": "obj_1",
+      "type": "off",
+      "model": "bunny.off",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [1.0],
+        "shiness": 32,
+        "color": [0, 0.3, 0]
+      },
+      "transform": {
+        "position": [0, -1.0, 0.1],
+        "rotation": [0],
+        "scale": [3]
+      }
+    },
+    {
+      "name": "obj_2",
+      "type": "plane",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.5],
+        "ks": [0.0],
+        "shiness": 32,
+        "color": [1]
+      },
+      "transform": {
+        "position": [0, -0.9, 0],
+        "rotation": [0],
+        "scale": [2]
+      }
+    }
+  ]
+
+}

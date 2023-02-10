@@ -1,0 +1,81 @@
+{
+  "generate_shader": {
+                        "inputs": ["Phong/phong_vsm.main_fs"],
+                        "outputs": ["Phong/phong.fs"]
+                     },
+
+  "render_method": "RenderPhong",
+
+  "shadow_config": {
+                      "shadow_method":"VarianceShadowMap",
+                      "kernel_size": 3,
+                      "variance_min": 0.0001,
+                      "p_min": 0.4,
+                      "use_tight_space": true,
+                      "resolution": [512, 512],
+                      "use_sat": false
+                   },
+
+  "ambient": [0.0],
+
+  "camera": {
+    "position": [0.551420, -0.577150, 0.118063],
+    "rotation": [-0.366264, 0.830000, 0.000000]
+  },
+
+  "lights": [
+    {
+      "name": "dl",
+      "type": "direct_light",
+      "direction": [0, -1, -1.5],
+      "intensity": 0.8,
+      "render_shadow": true
+    },
+    {
+      "name": "dl",
+      "type": "direct_light",
+      "direction": [1, -1, 0],
+      "intensity": 0.8,
+      "render_shadow": true
+    }
+  ],
+
+  "scene_objects": [
+    {
+      "name": "obj_1",
+      "type": "obj",
+      "model": "hexacar military/hexacar military.obj",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [0.8],
+        "ks": [1.0],
+        "shiness": 64,
+        "color": [0.3, 0.3, 0.3]
+      },
+      "transform": {
+        "position": [-0.05, -0.8, 0],
+        "rotation": [0],
+        "scale": [0.001]
+      }
+    },
+    {
+      "name": "obj_2",
+      "type": "plane",
+      "material": {
+        "type": "phong_mat",
+        "ka": [1],
+        "kd": [1.0],
+        "ks": [0],
+        "shiness": 32,
+        "color": [1]
+      },
+      "transform": {
+        "position": [0, -0.9, 0],
+        "rotation": [0],
+        "scale": [10]
+      }
+    }
+  ]
+
+}

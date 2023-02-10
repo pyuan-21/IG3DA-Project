@@ -1,0 +1,128 @@
+/*light info*/
+struct LightCamInfo
+{
+	mat4 lightMat;
+	float near;
+	vec3 lightCamPos;
+	vec3 lightViewDir;
+};
+uniform LightCamInfo lightCamInfos[maxLightNum]; // "maxLightNum" is defined in "phong_sm.main_fs"
+
+/*shadow map*/
+uniform sampler2D shadowMaps[maxLightNum]; // "maxLightNum" is defined in "phong_sm.main_fs"
+uniform float bias;
+
+/*PCSS-percentage closer Soft filtering*/
+uniform int usePCSS = 0; /*indicate whether use PCSS to do filtering*/
+uniform int maxSearchSize; /*separate search size and light size*/
+uniform	int lightSize;
+uniform int minPenumbraSize;
+uniform int maxPenumbraSize;
+uniform float penumbraRatio; /*proportional number for penumbra size*/
+
+float GetSearchSize(LightCamInfo lightCamInfo)
+{
+	// search area kernel size is based on light to distance and light size
+	vec3 worldPos = (modelMat*vec4(fPos,1.0)).xyz;
+	vec3 v = worldPos - lightCamInfo.lightCamPos;
+	vec3 proAxis = normalize(lightCamInfo.lightViewDir);
+	float linearDepth = dot(v, proAxis);
+	float weight = (linearDepth - lightCamInfo.near) / linearDepth;
+	weight = clamp(weight, 0.0, 1.0);
+	// according to the paper, the size of search region is proportional to distance and maxSearchSize
+	// from the PCSS presentation slide Page 14, search size is 0 when being at the receiver plane, 
+	// and shadow map is at near plane. We want to know the size when being at the near plane.
+	//return lightSize*weight; 
+	// I separate search area size and light size, because only tiny search area can be considered as planar.
+	// Also for performance
+	return maxSearchSize*weight;
+}
+
+// receiverDepth: receiver depth, current: uv of current fragement in ShadowMap
+float GetBlockerDepth(float receiverDepth, vec2 current, sampler2D shadowMap, vec2 texelSize, float searchSize)
+{
+	float halfSearchSize = lightSize / 2;
+	float blockerDepth = 0.0;
+	int totalNum = 0;
+	for(float i = -halfSearchSize; i <= halfSearchSize; i++)
+	{
+		for(float j = -halfSearchSize; j <= halfSearchSize; j++)
+		{
+			float refDepth = texture(shadowMap, current+vec2(i,j)*texelSize).r;
+			if(receiverDepth>=(refDepth+bias))
+			{
+				totalNum += 1;
+				blockerDepth += (refDepth+bias);
+			}
+		}
+	}
+	if(totalNum == 0)
+		return 1.0; // no blocker found
+	else
+		return blockerDepth/totalNum;
+}
+
+float ComputePenumbraSize(float receiverDepth, float blockerDepth, float lightSize)
+{
+	float penumbraSize = (receiverDepth - blockerDepth)*lightSize / blockerDepth; // can be proportional
+	// In fact, (r-b)/b*size --> (r/b-1)*size. --> r/b can be a very large number!
+	// Also we can draw the picture when the blocker area is near to area light, the penumbra size will become very large
+	// Therefore, clamping penumbra size makes sense.
+	return clamp(penumbraSize*penumbraRatio, minPenumbraSize, maxPenumbraSize);
+}
+
+float ComputeLightRatio(LightCamInfo lightCamInfo, sampler2D shadowMap)
+{
+	/*ComputeLightRatio: lightRatio is inside [0, 1]*/
+	vec4 clipCoord = lightCamInfo.lightMat*modelMat*vec4(fPos,1); /*clip space*/
+	vec3 ndcCoord = clipCoord.xyz / clipCoord.w; /*ndc space: [-1,1]^3*/ 
+	vec3 shadowCoord = (ndcCoord+1)/2; /*map [-1,1]^3 to [0,1]^3*/
+	float fragDepth = shadowCoord.z;
+
+	vec2 texSize = textureSize(shadowMap, 0);
+	vec2 texelSize = 1.0/texSize;
+
+	float result = 0.0; // indicate how much lighting on this fragment
+
+	if(usePCSS==1)
+	{
+		// use PCSS to estimate Penumbra size then using PCF with this size to compute light ratio
+
+		float searchSize = GetSearchSize(lightCamInfo);
+
+		float blockerDepth = GetBlockerDepth(fragDepth, shadowCoord.xy, shadowMap, texelSize, searchSize);
+		if(blockerDepth == 0)
+			result = 0.0;
+		else
+		{
+			if(blockerDepth<=fragDepth)
+			{
+				int totalNum = 0;
+				float halfPenumSize = ComputePenumbraSize(fragDepth, blockerDepth, lightSize) / 2;
+
+				for(float i = -halfPenumSize; i <= halfPenumSize; i++)
+				{
+					for(float j = -halfPenumSize; j <= halfPenumSize; j++)
+					{
+						float refDepth = texture(shadowMap, shadowCoord.xy+vec2(i,j)*texelSize).r;
+						if(fragDepth<(refDepth+bias))
+							result += 1.0;
+						totalNum += 1;
+					}
+				}
+				result /= totalNum;
+			}
+			else
+				result = 1.0; // no blocker found
+		}
+	}
+	else
+	{
+		// produce hard shadow
+		float refDepth = texture(shadowMap, shadowCoord.xy).r; 
+		if(fragDepth<(refDepth+bias))
+			result = 1.0;
+	}
+
+	return result;
+}
