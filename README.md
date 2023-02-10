@@ -9,4 +9,4 @@ Code base: IceRender-my personal renderer, still developping :), more details pl
 Some results:
 
 - Basic Shadow Maps:
-![img1](results/SM.png)
+ <img src="/results/SM.png" style="width:100px;"/>\
